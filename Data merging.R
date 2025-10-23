@@ -1,4 +1,7 @@
 
+# clear workspace
+rm(list = ls())
+
 library(readxl)
 library(dplyr)
 library(lubridate)
@@ -10,9 +13,6 @@ library(data.table)
 
 # General recommendations: 
 # have separate scripts for N2O and CH4 data. 
-
-# clear workspace
-rm(list = ls())
 
 
 aeris <- read_excel("Excel Aeris.xlsx")
