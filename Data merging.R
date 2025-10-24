@@ -36,12 +36,12 @@ da <- as.data.table(da)
 da[ , date.time := Datatime + 1 * 3600]
 
 # making a date.time column for mearing, rounded to nearest minute
-da[, date.time := as.POSIXct(round(Datatime, "mins"), tzone = 'UTC')]
+da[, date.time := as.POSIXct(round(Datatime, "mins"), tz = 'UTC')]
 
 
 # change dc begin time to same format as date.time in da
-dc[, begin.time := as.POSIXct(begin.time, format = '%d-%m-%Y %H:%M', tzone = 'UTC')]
-dc[, final.time := as.POSIXct(final.time, format = '%d-%m-%Y %H:%M', tzone = 'UTC')]
+dc[, begin.time := as.POSIXct(begin.time, format = '%d-%m-%Y %H:%M', tz = 'UTC')]
+dc[, final.time := as.POSIXct(final.time, format = '%d-%m-%Y %H:%M', tz = 'UTC')]
 
 # adding rows with chamber, id and N2O info for between begin.time and final.time
 # sequence function for one row
@@ -83,7 +83,6 @@ dt <- dt[!is.na(start.N2O)]
 # something is wrong, data is missing - e.g. chamber 11 there is only the first days of 
 # measurements and not the subsequent ones. 
 test <- dt[dt$chamber == '11', ]
-
 
 
 # Create a column Datetime in the new file
