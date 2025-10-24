@@ -24,20 +24,35 @@ dc <- dc[-1, ]
 
 
 # splitting dc in two data.tables, one for N2O and one for CH4 
-dc.n2o <- dc[! is.na(start.N2O), ]
-dc.ch4 <- dc[! is.na(start.CH4), ]
+
+dc$start.N2O <- as.numeric(dc$start.N2O)
+dc$end.N2O <- as.numeric(dc$end.N2O)
+
+dc <- dc[! is.na(start.N2O), ]
+
+# Lorenzo, I am unsure if the data there is in the dc is Aeries time or 'real time'? 
+# if it is Aeris time then the next line correting the time should not be done
+# here, but you should correct time time after mearging and before including 
+# temperature data. 
 
 # correcting Aeris time
 # N2O aeris is 1 hour behind real time
-da[ , Datatime := Datatime + 1 * 3600]
+da[ , date.time := Datatime + 1 * 3600]
 
 # making a date.time column for mearing, rounded to nearest minute
-da[, date.time := as.POSIXct(round(Datatime, "mins"))]
+da[, begin.time := as.POSIXct(round(Datatime, "mins"), tzone = 'UTC')]
+da[, final.time := as.POSIXct(round(Datatime, "mins"), tzone = 'UTC')]
+
+# change dc begin time to same format as date.time in da
+dc[, begin.time := as.POSIXct(begin.time, format = "%d-%m-%Y %H:%M", tzone = 'UTC')]
+dc[, final.time := as.POSIXct(final.time, format = "%d-%m-%Y %H:%M", tzone = 'UTC')]
+
+dt <- merge(da, dc, by = "begin.time", all.x = TRUE)
+dt <- merge(dt, dc, by = "final.time", all.x = TRUE)
 
 
 
-
-
+# 251024, code below not used, code below not done JP
 
 # Create a column Datetime in the new file
 aeris <- aeris %>%
