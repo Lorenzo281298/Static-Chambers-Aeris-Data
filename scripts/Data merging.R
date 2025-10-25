@@ -73,35 +73,46 @@ dt <- merge(da, dcl, by = "date.time", all.x = TRUE, allow.cartesian = TRUE)
 # dropping Aeris data when not measured on chamber: 
 dt <- dt[!is.na(start.N2O)]
 
-# # trying to make a plot just to see that is looks ok
+
+# change header in da
+
+# calculate elapsed time pr measurement in minutes
+
+# plotting all
+# adding chamber number data to HMRds
+dt$date <- as.Date(dt$date.time)
+unique_dates <- unique(dt$date)
+
+for (d in unique_dates){
+  df_subset <- dt[dt$date == d, ]
+
+p <- ggplot(df_subset, aes(elapsed.time, n2o)) + 
+    geom_point() + 
+    facet_wrap(~ chamber, scales = 'free_y') + 
+    ggtitle(paste('N2O on', d)) +
+    theme_bw()
+ggsave(filename = paste0('../plots/N2O check/N2O_free_y_', d, '.png'), plot = p, width = 10, height = 10)
+}
+
+
+
+# # Create a column Datetime in the new file
+# aeris <- aeris %>%
+#   mutate(Datetime = parse_date_time(paste(Day, Hour), orders = c("mdy HMS", "ymd HMS", "dmy HMS", "mdy HM", "ymd HM", "dmy HM")))
 # 
-# library(ggplot2)
-# ggplot(dt, aes(start.N2O, end.N2O, color = chamber)) + 
-#   geom_point() + 
-#   facet_wrap(~ chamber)
-
-# something is wrong, data is missing - e.g. chamber 11 there is only the first days of 
-# measurements and not the subsequent ones. 
-test <- dt[dt$chamber == '11', ]
-
-
-# Create a column Datetime in the new file
-aeris <- aeris %>%
-  mutate(Datetime = parse_date_time(paste(Day, Hour), orders = c("mdy HMS", "ymd HMS", "dmy HMS", "mdy HM", "ymd HM", "dmy HM")))
-
-# Associate Chamber and ID according to the time interval
-aeris <- aeris %>%
-  rowwise() %>%
-  mutate(
-    match = list(
-      chambers %>%
-        filter(Datetime >= Begin_time & Datetime <= Final_time)
-    ),
-    Chamber = ifelse(length(match$Chamber) > 0, match$Chamber[1], NA),
-    ID = ifelse(length(match$ID) > 0, match$ID[1], NA)
-  ) %>%
-  select(-match) %>%
-  ungroup()
-
-# Save the file
-write_xlsx(aeris, "Aeris_con_chamber_ID.xlsx")
+# # Associate Chamber and ID according to the time interval
+# aeris <- aeris %>%
+#   rowwise() %>%
+#   mutate(
+#     match = list(
+#       chambers %>%
+#         filter(Datetime >= Begin_time & Datetime <= Final_time)
+#     ),
+#     Chamber = ifelse(length(match$Chamber) > 0, match$Chamber[1], NA),
+#     ID = ifelse(length(match$ID) > 0, match$ID[1], NA)
+#   ) %>%
+#   select(-match) %>%
+#   ungroup()
+# 
+# # Save the file
+# write_xlsx(aeris, "Aeris_con_chamber_ID.xlsx")
